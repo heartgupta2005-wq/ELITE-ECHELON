@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEngine | Smart Issue Reporting</title>
+    <meta name="description"
+        content="Report civic issues and track their real-time resolution. SLA monitoring, analytics, and accountability dashboard.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet.js for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Background Elements -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <nav class="glass-nav">
+        <div class="nav-brand">Civic<span class="highlight">Engine</span></div>
+        <div class="nav-links" id="navLinks">
+            <!-- Dynamic Nav Links populated by JS -->
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- ==================== LOGIN TAB ==================== -->
+        <section id="login-tab" class="tab-content">
+            <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
+                <div class="card-header">
+                    <h2>Welcome Back</h2>
+                    <p>Log in to your account.</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="primary-btn submit-btn">
+                        <span class="btn-text">Log In</span>
+                        <div class="loader" style="display: none;"></div>
+                    </button>
+                    <div id="loginMessage" class="form-message"></div>
+                    <div style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+                        Don't have an account? <span class="nav-link-inline" data-tab="register-tab"
+                            style="color:var(--primary);cursor:pointer;font-weight:600;">Register Here</span>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==================== REGISTER TAB ==================== -->
+        <section id="register-tab" class="tab-content">
+            <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
+                <div class="card-header">
+                    <h2>Create Account</h2>
+                    <p>Join CivicEngine to report issues securely.</p>
+                </div>
+                <form id="registerForm">
+                    <div class="input-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" name="name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPhone">Phone Number</label>
+                        <input type="tel" id="regPhone" name="phone" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword">Secure Password</label>
+                        <input type="password" id="regPassword" name="password" required minlength="6">
+                    </div>
+                    <button type="submit" class="primary-btn submit-btn">
+                        <span class="btn-text">Sign Up</span>
+                        <div class="loader" style="display: none;"></div>
+                    </button>
+                    <div id="registerMessage" class="form-message"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==================== PROFILE TAB ==================== -->
+        <section id="profile-tab" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2>My Profile</h2>
+                </div>
+                <div style="padding: 2rem;">
+                    <div class="profile-layout">
+                        <div class="profile-hero">
+                            <div class="profile-avatar" id="profAvatar">?</div>
+                            <div class="profile-identity">
+                                <h1 id="profName" style="font-size: 2rem; color: var(--dark); margin-bottom: 0.25rem;">
+                                    Loading...</h1>
+                                <p id="profEmail" style="color: var(--text-muted); font-size: 1.1rem;">...</p>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-box">
+                                <p class="muted">Contact Phone</p>
+                                <h3 id="profPhone" style="margin-top:0.5rem; font-size:1.4rem;">...</h3>
+                            </div>
+                            <div class="stat-box">
+                                <p class="muted">Total Submissions</p>
+                                <h3 id="profTotal" style="margin-top:0.5rem; font-size:1.8rem;">0</h3>
+                            </div>
+                            <div class="stat-box">
+                                <p class="muted">Member Since</p>
+                                <h3 id="profJoined" style="margin-top:0.5rem; font-size:1.2rem;">...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MY COMPLAINTS TAB ==================== -->
+        <section id="my-complaints-tab" class="tab-content">
+            <div class="dashboard-header glass-card">
+                <h2>My Submissions</h2>
+                <span class="muted">Track exactly what you've submitted</span>
+            </div>
+            <div class="complaints-grid" id="myComplaintsGrid">
+                <div class="loading-state">Loading your personal complaints...</div>
+            </div>
+        </section>
+
+        <!-- ==================== REPORT TAB ==================== -->
+        <section id="report-tab" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2>Submit a Complaint</h2>
+                    <p>Help us improve your city. Provide details about the civic issue.</p>
+                </div>
+                <form id="complaintForm">
+                    <input type="hidden" id="user_id" name="user_id">
+                    <div class="input-group">
+                        <label for="description">Issue Description</label>
+                        <textarea id="description" name="description" placeholder="Describe the issue in detail..."
+                            required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="image">Photo <span class="muted">(Optional)</span></label>
+                        <div class="file-upload">
+                            <input type="file" id="image" name="image" accept="image/*">
+                            <div class="file-upload-placeholder">
+                                <span>Click or drag image to upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group geolocation-group">
+                        <label>Location Area</label>
+                        <button type="button" id="getLocationBtn" class="secondary-btn">📍 Fetch My Location</button>
+                        <div id="locationStatus" class="location-status">Location not captured.</div>
+                        <input type="hidden" id="lat" name="lat">
+                        <input type="hidden" id="lng" name="lng">
+                    </div>
+                    <button type="submit" class="primary-btn submit-btn">
+                        <span class="btn-text">Submit Issue</span>
+                        <div class="loader" style="display: none;"></div>
+                    </button>
+                    <div id="formMessage" class="form-message"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==================== PUBLIC DASHBOARD TAB ==================== -->
+        <section id="dashboard-tab" class="tab-content">
+
+            <!-- KPI Analytics Bar -->
+            <div class="stats-bar" id="statsBar">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg,#4F46E5,#818CF8)">📋</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="stat-total">—</div>
+                        <div class="kpi-label">Total Issues</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg,#F59E0B,#FCD34D)">⏳</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="stat-pending">—</div>
+                        <div class="kpi-label">Pending</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg,#10B981,#6EE7B7)">✅</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="stat-resolved">—</div>
+                        <div class="kpi-label">Resolved</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg,#EF4444,#FCA5A5)">🚨</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="stat-escalated">—</div>
+                        <div class="kpi-label">Escalated</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg,#8B5CF6,#C4B5FD)">⚠️</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="stat-sla">—</div>
+                        <div class="kpi-label">SLA Breached</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Header + View Toggle -->
+            <div class="dashboard-header glass-card">
+                <h2>Public Civic Issues</h2>
+                <div class="view-toggle">
+                    <button id="listViewBtn" class="toggle-btn active" title="List View">☰ List</button>
+                    <button id="mapViewBtn" class="toggle-btn" title="Map View">🗺 Map</button>
+                </div>
+            </div>
+
+            <!-- Advanced Filter Bar -->
+            <div class="filter-bar glass-card">
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Escalated L1">Escalated L1</option>
+                    <option value="Escalated L2">Escalated L2</option>
+                </select>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Road">Road</option>
+                    <option value="Water">Water</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Sanitation">Sanitation</option>
+                    <option value="Public Safety">Public Safety</option>
+                    <option value="Parks">Parks</option>
+                    <option value="General">General</option>
+                </select>
+                <input type="text" id="searchFilter" placeholder="🔍 Search by ID..." style="max-width:180px;">
+                <input type="date" id="dateFromFilter" title="From date">
+                <input type="date" id="dateToFilter" title="To date">
+                <button id="resetFiltersBtn" class="secondary-btn">Reset</button>
+            </div>
+
+            <!-- LIST VIEW -->
+            <div class="complaints-grid" id="complaintsGrid">
+                <div class="loading-state">Loading complaints...</div>
+            </div>
+
+            <!-- MAP VIEW (hidden by default) -->
+            <div id="mapView" style="display:none;">
+                <div id="leafletMap"></div>
+                <p class="map-hint">🗺 Showing complaints with GPS coordinates. Click a marker for details.</p>
+            </div>
+
+        </section>
+
+        <!-- ==================== COMPLAINT MODAL DETAILS ==================== -->
+        <div id="complaintModal" class="modal-overlay">
+            <div class="modal-content glass-card">
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== CHATBOT ==================== -->
+    <button id="chatbotToggle" class="chatbot-btn" title="Ask CivicBot">
+        <span class="chatbot-icon">💬</span>
+    </button>
+
+    <div id="chatWindow" class="chat-window">
+        <div class="chat-header">
+            <span>🤖 CivicBot Assistant</span>
+            <button id="chatClose" class="chat-close-btn">&times;</button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <div class="chat-msg bot">👋 Hi! I'm CivicBot. I can help you report issues, check complaint status, or
+                navigate the dashboard. Type <strong>help</strong> to get started.</div>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+            <button id="chatSend" class="primary-btn" style="border-radius:10px;padding:0.6rem 1rem;">➤</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
