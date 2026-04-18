@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEngine | Government Portal</title>
+    <meta name="description"
+        content="Government administration portal for managing civic complaints, departments, and SLA enforcement.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="css/gov.css">
+</head>
+
+<body>
+    <div class="bg-shape s1"></div>
+    <div class="bg-shape s2"></div>
+
+    <!-- ══════════════ NAV ══════════════ -->
+    <nav class="gov-nav">
+        <div class="nav-brand">
+            <span class="brand-icon">🏛</span>
+            Civic<span class="hl">Engine</span>
+            <span class="gov-badge" id="govBadge">Gov</span>
+        </div>
+        <div class="nav-center">
+            <button class="nav-btn active" data-panel="dashboard-panel">📊 Dashboard</button>
+            <button class="nav-btn" data-panel="complaints-panel">📋 Complaints</button>
+            <button class="nav-btn admin-only" data-panel="departments-panel">🏢 Departments</button>
+        </div>
+        <div class="nav-right">
+            <div class="user-chip" id="userChip">
+                <div class="user-avatar" id="navAvatar">?</div>
+                <div class="user-info">
+                    <div class="user-name" id="navName">Loading…</div>
+                    <div class="user-role" id="navRole">—</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </nav>
+
+    <main class="gov-container">
+
+        <!-- ══════════════ DASHBOARD PANEL ══════════════ -->
+        <section id="dashboard-panel" class="gov-panel active">
+            <div class="panel-header">
+                <div>
+                    <h1 class="panel-title">Operations Dashboard</h1>
+                    <p class="panel-sub" id="dashboardSubtitle">System Overview</p>
+                </div>
+                <div class="header-actions">
+                    <span class="refresh-badge" id="pollIndicator">🔄 Live</span>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#4F46E5,#818CF8)">📋</div>
+                    <div>
+                        <div class="kpi-val" id="gs-total">—</div>
+                        <div class="kpi-lbl">Total</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#F59E0B,#FCD34D)">⏳</div>
+                    <div>
+                        <div class="kpi-val" id="gs-pending">—</div>
+                        <div class="kpi-lbl">Pending</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#3B82F6,#93C5FD)">🔧</div>
+                    <div>
+                        <div class="kpi-val" id="gs-inprogress">—</div>
+                        <div class="kpi-lbl">In Progress</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#10B981,#6EE7B7)">✅</div>
+                    <div>
+                        <div class="kpi-val" id="gs-resolved">—</div>
+                        <div class="kpi-lbl">Resolved</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#EF4444,#FCA5A5)">🚨</div>
+                    <div>
+                        <div class="kpi-val" id="gs-escalated">—</div>
+                        <div class="kpi-lbl">Escalated</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD)">⚠️</div>
+                    <div>
+                        <div class="kpi-val" id="gs-sla">—</div>
+                        <div class="kpi-lbl">SLA Breached</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="section-card">
+                <div class="section-card-header">
+                    <h3>📍 Complaint Locations</h3>
+                    <div>
+                        <button class="outline-btn" id="govMapLiveLocBtn">📍 Fetch Live Location Update</button>
+                        <button class="outline-btn" id="refreshMapBtn">Refresh Map</button>
+                    </div>
+                </div>
+                <div id="govLeafletMap"></div>
+                <p class="map-hint">Click a marker to view complaint details.</p>
+            </div>
+        </section>
+
+        <!-- ══════════════ COMPLAINTS PANEL ══════════════ -->
+        <section id="complaints-panel" class="gov-panel">
+            <div class="panel-header">
+                <div>
+                    <h1 class="panel-title">Complaint Management</h1>
+                    <p class="panel-sub" id="complaintsPanelSub">All Complaints</p>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-row">
+                <select id="gStatusFilter">
+                    <option value="">All Statuses</option>
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Resolved</option>
+                    <option>Escalated L1</option>
+                    <option>Escalated L2</option>
+                </select>
+                <select id="gCatFilter">
+                    <option value="">All Categories</option>
+                    <option>Road</option>
+                    <option>Water</option>
+                    <option>Electricity</option>
+                    <option>Sanitation</option>
+                    <option>Public Safety</option>
+                    <option>Parks</option>
+                    <option>General</option>
+                </select>
+                <select id="gDeptFilter">
+                    <option value="">All Departments</option>
+                </select>
+                <input type="text" id="gSearchFilter" placeholder="🔍 Search ID…">
+                <input type="date" id="gDateFrom">
+                <input type="date" id="gDateTo">
+                <button class="outline-btn" id="gResetFilters">Reset</button>
+            </div>
+
+            <!-- Complaints Table -->
+            <div class="table-wrap">
+                <table class="complaints-table" id="complaintsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Reporter</th>
+                            <th>Status</th>
+                            <th>Department</th>
+                            <th>SLA</th>
+                            <th>Filed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="complaintsTableBody">
+                        <tr>
+                            <td colspan="8" class="table-empty">Loading complaints…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ══════════════ DEPARTMENTS PANEL (Admin only) ══════════════ -->
+        <section id="departments-panel" class="gov-panel">
+            <div class="panel-header">
+                <div>
+                    <h1 class="panel-title">Department Management</h1>
+                    <p class="panel-sub">Create, edit, and remove departments</p>
+                </div>
+                <button class="primary-btn" id="addDeptBtn">+ Add Department</button>
+            </div>
+
+            <!-- Add/Edit Form -->
+            <div class="section-card" id="deptFormCard" style="display:none">
+                <div class="section-card-header">
+                    <h3 id="deptFormTitle">Add Department</h3>
+                    <button class="icon-btn" id="closeDeptForm">✕</button>
+                </div>
+                <div class="dept-form">
+                    <input type="hidden" id="deptEditId">
+                    <div class="form-group">
+                        <label>Department Name *</label>
+                        <input type="text" id="deptName" placeholder="e.g. Water & Utilities">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="deptDesc" placeholder="Briefly describe department responsibilities..."
+                            style="background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text); padding:0.7rem 1rem; border-radius:9px; font-family:var(--font); font-size:0.9rem; min-height:80px; resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                        <div class="form-group">
+                            <label>Alert Email (Officer)</label>
+                            <input type="email" id="deptEmail" placeholder="officer@civic.gov">
+                        </div>
+                        <div class="form-group">
+                            <label>Complaint Threshold</label>
+                            <input type="number" id="deptThreshold" placeholder="10" min="1">
+                        </div>
+                    </div>
+                    <button class="primary-btn" id="saveDeptBtn" style="margin-top:1rem;">Save Department</button>
+                    <div id="deptFormMsg" class="form-msg"></div>
+                </div>
+            </div>
+
+            <!-- Departments Table -->
+            <div class="table-wrap">
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Alert Email</th>
+                            <th>Threshold</th>
+                            <th>Active</th>
+                            <th>Resolved</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptsTableBody">
+                        <tr>
+                            <td colspan="6" class="table-empty">Loading…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main><!-- /gov-container -->
+
+    <!-- ══════════════ COMPLAINT DETAIL MODAL ══════════════ -->
+    <div class="modal-overlay" id="govModal">
+        <div class="modal-box">
+            <button class="modal-close" id="govModalClose">✕</button>
+            <div id="govModalBody">Loading…</div>
+        </div>
+    </div>
+
+    <script src="js/gov.js"></script>
+</body>
+
+</html>

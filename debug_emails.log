@@ -1,0 +1,20 @@
+--- [2026-04-18 00:28:41] ---
+TO: heartgupta2005@gmail.com
+SUBJECT: Manual Priority Alert: Sanitation
+BODY: 
+    <div style='font-family: sans-serif; padding: 20px; border: 1px solid #4F46E5; border-radius: 12px; max-width: 600px;'>
+        <h2 style='color: #4F46E5;'>🔵 Manual Priority Notification</h2>
+        <p>This is a manual alert triggered by the System Administrator.</p>
+        <hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;'>
+        <p><strong>Department:</strong> Sanitation</p>
+        <p><strong>Active Complaints:</strong> 20</p>
+        <p style='margin-top: 20px; background: #e0e7ff; padding: 15px; border-radius: 8px; color: #3730a3;'>
+            The System Administrator has flagged this department for immediate attention. Please review the pending queue.
+        </p>
+        <p style='margin-top: 20px; font-size: 0.875rem; color: #64748b;'>
+            Government Portal: <a href='http://localhost/civic/gov.html'>Login Here</a>
+        </p>
+    </div>
+    
+-----------------------------------
+
