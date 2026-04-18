@@ -16,10 +16,10 @@ function sendCivicEmail($to, $subject, $body)
     try {
         // --- SMTP CONFIGURATION ---
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
+        $mail->Host = '';
         $mail->SMTPAuth = true;
-        $mail->Username = 'aayush.sharma2605@gmail.com';
-        $mail->Password = 'kgmf vjlp kica zxoh';
+        $mail->Username = '';
+        $mail->Password = '';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         // ---------------------------
